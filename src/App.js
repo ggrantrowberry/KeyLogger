@@ -1,4 +1,6 @@
-import React, { Component } from 'react';
+import React, {
+  Component
+} from 'react';
 import './App.css';
 import uuidv4 from 'uuid'
 import axios from 'axios';
@@ -19,23 +21,27 @@ const testName = [
 const serverUrl = "https://gugq9wuynd.execute-api.us-west-2.amazonaws.com/default/uploadTypingData"
 
 class App extends Component {
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
 
       loggedIn: false,
       testIndex: 0
     }
-  
+
     this.login = this.login.bind(this);
     this.finishTest = this.finishTest.bind(this);
   }
 
-  login(username){
-    this.setState({id: uuidv4(), loggedIn: true, username: username});
+  login(username) {
+    this.setState({
+      id: uuidv4(),
+      loggedIn: true,
+      username: username
+    });
   }
 
-  finishTest(keyPresses){
+  finishTest(keyPresses) {
     let jsonOut = {
       id: this.state.id,
       username: this.state.username,
@@ -44,13 +50,13 @@ class App extends Component {
     }
     console.log("jsonOut:", JSON.stringify(jsonOut));
     //Call API
-    axios.options(serverUrl, {jsonOut})
-    .then(res => {
-      console.log(res);
-    })
-    .catch(error => {
-      console.log(error);
-    })
+    axios.post(serverUrl, jsonOut)
+      .then(res => {
+        console.log(res);
+      })
+      .catch(error => {
+        console.log(error);
+      })
     this.setState((prevState) => {
       let newState = prevState;
       newState.testIndex++;
@@ -60,178 +66,239 @@ class App extends Component {
 
   render() {
     let toRender = null
-    if(!this.state.loggedIn){
-      toRender =
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh"}}
-        >
-          <Login
-            login={this.login}
-          />
-        </div>
-    } else if(this.state.testIndex < testText.length) {
-      toRender = 
-        <div>
-          <Test
-            text={testText[this.state.testIndex]}
-            finish={this.finishTest}
-          />
-        </div>
-    } else {
-      toRender = 
-        <div>
-          <p>Thank You!</p>
-        </div>
-    }
-    return (
-      <div>
-          {toRender}
-      </div>);
-  }
-}
-
-
-class Login extends Component{
-  constructor(props){
-    super(props);
-    this.state ={
-      inputValue: ''
-    }
-  }
-
-  validate = () => {
-    return this.state.inputValue.length;
-  }
-
-  login = () => {
-    this.props.login(this.state.inputValue);
-  }
-
-  handleInputChange = (e) => {
-    this.setState({inputValue: e.target.value});
-  }
-
-  render(){
-    return (
-      <div style={{display:'flex', alignContent:'center', flexDirection:'column'}}>
-        <div>What's your name?</div>
-        <input 
-          value={this.state.inputValue}
-          onChange={this.handleInputChange}
-        >
-        </input>
-        <button
-          disabled={!this.validate()}
-          onClick={this.login}
-        >Proceed</button>
-      </div>
-    )
-  }
-}
-
-
-class Test extends Component{
-  constructor(props){
-    super(props);
-    this.state = {
-      time: 0,
-      isOn: false,
-      start: 0,
-      keyPresses: [],
-      keyDownPressed: false,
-      textAreaContent: ''
-    }
-    this.keyPress = this.keyPress.bind(this);
-    this.startTimer = this.startTimer.bind(this);
-    this.keyDown = this.keyDown.bind(this);
-    this.keyUp = this.keyUp.bind(this);
-    this.finishTest = this.finishTest.bind(this);
-    this.handleTextChange = this.handleTextChange.bind(this);
-  }
-
-  startTimer() {
-    this.setState({
-      isOn: true,
-      time: this.state.time,
-      start: Date.now() - this.state.time
-    })
-    this.timer = setInterval(() => this.setState({
-      time: Date.now() - this.state.start
-    }), 1);
-  }
-
-  finishTest(){
-    clearInterval(this.timer);
-    this.props.finish(this.state.keyPresses);
-     //Reset the state
-    this.setState({
-      time:0,
-      isOn: false,
-      start:0,
-      keyPresses: [],
-      keyDownPressed: false,
-      textAreaContent: ''
-    })
-  }
-
-  keyUp(e){
-    let key = e.key;
-    this.setState(prevState => {
-      let newState = prevState;
-      newState.keyDownPressed = false;
-      console.log("keyupTime", newState.time);
-      console.log("keydownstart from keyup", newState.keyDownStart)
-      newState.keyPresses.push({keyPressed: key, time: newState.time, keyPressDuration: newState.time-newState.keyDownStart});
-      console.log(newState.keyPresses);
-      return newState;
-    })
-  }
-
-  keyDown(e){
-    if(!this.state.isOn){
-      this.startTimer();
-    }
-    this.setState(prevState =>{
-      let newState = prevState;
-      if(!newState.keyDownPressed){
-        console.log("keydowntime", newState.time);
-        newState.keyDownStart = newState.time;
+    if (!this.state.loggedIn) {
+      toRender = <
+        div style = {
+          {
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100vh"
+          }
+        } >
+        <
+        Login
+      login = {
+        this.login
       }
-      newState.keyDownPressed = true;
-      return newState;
-    });
+      /> < /
+      div >
+    } else if (this.state.testIndex < testText.length) {
+      toRender = <
+        div >
+        <
+        Test
+      text = {
+        testText[this.state.testIndex]
+      }
+      finish = {
+        this.finishTest
+      }
+      /> < /
+      div >
+    } else {
+      toRender = <
+        div >
+        <
+        p > Thank You! < /p> < /
+        div >
+    }
+    return ( <
+      div > {
+        toRender
+      } <
+      /div>);
+    }
   }
 
-  keyPress(e){
+
+  class Login extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        inputValue: ''
+      }
+    }
+
+    validate = () => {
+      return this.state.inputValue.length;
+    }
+
+    login = () => {
+      this.props.login(this.state.inputValue);
+    }
+
+    handleInputChange = (e) => {
+      this.setState({
+        inputValue: e.target.value
+      });
+    }
+
+    render() {
+      return ( <
+        div style = {
+          {
+            display: 'flex',
+            alignContent: 'center',
+            flexDirection: 'column'
+          }
+        } >
+        <
+        div > What 's your name?</div> <
+        input value = {
+          this.state.inputValue
+        }
+        onChange = {
+          this.handleInputChange
+        } >
+        <
+        /input> <
+        button disabled = {
+          !this.validate()
+        }
+        onClick = {
+          this.login
+        } >
+        Proceed < /button> < /
+        div >
+      )
+    }
+  }
+
+
+  class Test extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {
+        time: 0,
+        isOn: false,
+        start: 0,
+        keyPresses: [],
+        keyDownPressed: false,
+        textAreaContent: ''
+      }
+      this.keyPress = this.keyPress.bind(this);
+      this.startTimer = this.startTimer.bind(this);
+      this.keyDown = this.keyDown.bind(this);
+      this.keyUp = this.keyUp.bind(this);
+      this.finishTest = this.finishTest.bind(this);
+      this.handleTextChange = this.handleTextChange.bind(this);
+    }
+
+    startTimer() {
+      this.setState({
+        isOn: true,
+        time: this.state.time,
+        start: Date.now() - this.state.time
+      })
+      this.timer = setInterval(() => this.setState({
+        time: Date.now() - this.state.start
+      }), 1);
+    }
+
+    finishTest() {
+      clearInterval(this.timer);
+      this.props.finish(this.state.keyPresses);
+      //Reset the state
+      this.setState({
+        time: 0,
+        isOn: false,
+        start: 0,
+        keyPresses: [],
+        keyDownPressed: false,
+        textAreaContent: ''
+      })
+    }
+
+    keyUp(e) {
+      let key = e.key;
+      this.setState(prevState => {
+        let newState = prevState;
+        newState.keyDownPressed = false;
+        console.log("keyupTime", newState.time);
+        console.log("keydownstart from keyup", newState.keyDownStart)
+        newState.keyPresses.push({
+          keyPressed: key,
+          time: newState.time,
+          keyPressDuration: newState.time - newState.keyDownStart
+        });
+        console.log(newState.keyPresses);
+        return newState;
+      })
+    }
+
+    keyDown(e) {
+      if (!this.state.isOn) {
+        this.startTimer();
+      }
+      this.setState(prevState => {
+        let newState = prevState;
+        if (!newState.keyDownPressed) {
+          console.log("keydowntime", newState.time);
+          newState.keyDownStart = newState.time;
+        }
+        newState.keyDownPressed = true;
+        return newState;
+      });
+    }
+
+    keyPress(e) {
+
+    }
+
+    handleTextChange(e) {
+      this.setState({
+        textAreaContent: e.target.value
+      });
+    }
+
+    render() {
+      return ( <
+        div style = {
+          {
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            flexDirection: 'column'
+          }
+        } >
+        <
+        p style = {
+          {
+            marginLeft: '100px',
+            marginRight: '100px'
+          }
+        } > {
+          this.props.text
+        } < /p> <
+        textarea style = {
+          {
+            height: 100,
+            width: 500
+          }
+        }
+        value = {
+          this.state.textAreaContent
+        }
+        onChange = {
+          this.handleTextChange
+        }
+        onKeyDown = {
+          this.keyDown
+        }
+        onKeyUp = {
+          this.keyUp
+        } > < /textarea> <
+        button onClick = {
+          this.finishTest
+        } >
+        Finished < /button> < /
+        div >
+      );
+    }
 
   }
 
-  handleTextChange(e){
-    this.setState({textAreaContent:e.target.value});
-  }
-
-  render(){
-    return (      
-      <div style ={{
-        width: '100%', 
-        height: '100%', 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        flexDirection: 'column'
-      }}>
-        <p style={{marginLeft: '100px', marginRight: '100px'}}>{this.props.text}</p>
-        <textarea style={{height: 100, width: 500}} value={this.state.textAreaContent} onChange={this.handleTextChange} onKeyDown={this.keyDown} onKeyUp={this.keyUp}></textarea>
-        <button
-          onClick={this.finishTest}
-        >Finished</button>
-      </div>
-    );
-  }
-
-}
-
-export default App;
+  export default App;
